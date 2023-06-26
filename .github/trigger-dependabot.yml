@@ -1,0 +1,57 @@
+name: Generate POM and Scan Dependencies
+on:
+  push:
+    branches:
+      - main # Adjust the branch name as needed
+
+jobs:
+  generate-pom:
+    name: Generate POM and Scan Dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: 'adopt@1.11'
+
+      - name: Install Clojure CLI (clj)
+        run: |
+          curl -O https://download.clojure.org/install/linux-install-1.10.3.986.sh
+          chmod +x linux-install-1.10.3.986.sh
+          sudo ./linux-install-1.10.3.986.sh
+
+      - name: Install Leiningen (lein)
+        run: |
+          wget https://raw.githubusercontent.com/technomancy/leiningen/stable/bin/lein
+          chmod +x lein
+          sudo mv lein /usr/local/bin/
+
+      - name: Determine project type
+        run: |
+          if [ -f "deps.edn" ]; then
+            echo "Using deps.edn for project dependencies."
+            clj -Spom > pom.xml
+          elif [ -f "project.clj" ]; then
+            echo "Using project.clj for project dependencies."
+            lein pom
+          else
+            echo "Unable to determine project type. No deps.edn or project.clj found."
+            exit 1
+          fi
+
+      - name: Install Trivy
+        run: |
+          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
+
+      - name: Scan Dependencies with Trivy
+        run: |
+          trivy image --format=json -o dependencies.json
+
+      - name: Upload dependencies.json to GitHub Dependencies API
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: dependencies.json
