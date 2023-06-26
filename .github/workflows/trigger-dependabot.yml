@@ -44,15 +44,20 @@ jobs:
             exit 1
           fi
 
-      - name: Install Trivy
-        run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b /usr/local/bin
-
-      - name: Scan Dependencies with Trivy
-        run: |
-          trivy image --format=json -o dependencies.json
-
-      - name: Upload dependencies.json to GitHub Dependencies API
-        uses: github/codeql-action/upload-sarif@v1
+      - name: Run Trivy to produce SBOM
+        uses: aquasecurity/trivy-action@master
         with:
-          sarif_file: dependencies.json
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'spdx-json'
+          output: 'dependency-results.sbom.json'
+          # image-ref: '.'
+     
+
+      - name: SBOM upload 
+        uses: advanced-security/spdx-dependency-submission-action@v0.0.1
+        with:
+          filePath: "."
+          filePattern: "dependency-results.sbom.json"
+
+
