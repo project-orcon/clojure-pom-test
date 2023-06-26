@@ -39,7 +39,7 @@ jobs:
         run: |
           if [ -f "deps.edn" ]; then
             echo "Using deps.edn for project dependencies."
-            clj -Spom > pom.xml
+            clj -Spom
           elif [ -f "project.clj" ]; then
             echo "Using project.clj for project dependencies."
             lein pom
