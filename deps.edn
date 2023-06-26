@@ -2,4 +2,8 @@
  :deps
  {org.clojure/clojure {:mvn/version "1.11.1"},
   ring/ring-core {:mvn/version "1.8.0"},
-  ring/ring-jetty-adapter {:mvn/version "1.8.0"}}}
+  ring/ring-jetty-adapter {:mvn/version "1.8.0"}
+  lambdaisland/uri {:mvn/version "1.13.95"}}}
+
+
+
