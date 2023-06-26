@@ -6,6 +6,6 @@
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [ring/ring-core "1.8.0"]
                  [ring/ring-jetty-adapter "1.8.0"]
-                 [lambdaisland/uri "1.13.95"]]
+                 ]
   :main hello-world-clj.core
   :repl-options {:init-ns hello-world-clj.core})
